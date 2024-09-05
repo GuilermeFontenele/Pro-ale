@@ -1,38 +1,32 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    if (window.location.pathname.includes('home.html')) {
-        try {
-            const recentResponse = await fetch('/api/works/recent');
-            const popularResponse = await fetch('/api/works/popular');
-            
-            if (!recentResponse.ok || !popularResponse.ok) {
-                throw new Error('Erro ao carregar trabalhos');
-            }
+const API_URL = 'http://localhost:3000/api';
 
-            const recentWorks = await recentResponse.json();
-            const popularWorks = await popularResponse.json();
+document.getElementById('signup-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-            const recentWorksList = document.getElementById('recent-works');
-            const popularWorksList = document.getElementById('popular-works');
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-            recentWorks.forEach(work => {
-                const listItem = document.createElement('li');
-                listItem.textContent = work.title;
-                recentWorksList.appendChild(listItem);
-            });
+    try {
+        const response = await axios.post(`http://localhost:3000/api/register`, {
+            name,
+            email,
+            password
+        });
+        console.log('Resposta do servidor:', response);
 
-            popularWorks.forEach(work => {
-                const listItem = document.createElement('li');
-                listItem.textContent = work.title;
-                popularWorksList.appendChild(listItem);
-            });
+        if (response.status === 201) {
+            console.log('POST realizado com sucesso');
+            alert('Cadastro realizado com sucesso!');
+        }
+    } catch (error) {
+        console.error('Erro ao cadastrar:', error);
 
-        } catch (error) {
-            console.error('Erro ao carregar trabalhos:', error);
+        // Exibe um alerta de erro
+        if (error.response && error.response.data) {
+            alert(`Erro: ${error.response.data.message}`);
+        } else {
+            alert('Erro ao cadastrar. Tente novamente.');
         }
     }
-
-    document.getElementById('logout')?.addEventListener('click', function() {
-        localStorage.removeItem('token');
-        window.location.href = 'login.html'; // Redirecionar para a página de login
-    });
 });
